@@ -1,0 +1,14 @@
+{
+  "patient": "Alex Rivera",
+  "bills": [
+    {"statement_id": "ST-88412", "claim_id": "Claim # CLM-1001", "provider": "Bluebonnet Regional Medical Center", "service_date": "09/14/2026", "description": "Emergency department visit", "amount_due": "$412.00", "due_date": "11/14/2026"},
+    {"statement_id": "ST-88413", "claim_id": "CLM-1002", "provider": "Bluebonnet Regional Medical Center", "service_date": "09/14/2026", "description": "Comprehensive metabolic panel", "amount_due": "$25.00", "due_date": "11/14/2026"},
+    {"statement_id": "ST-89107", "claim_id": "CLM-1003", "provider": "Bluebonnet Regional Medical Center", "service_date": "10/02/2026", "description": "MRI lumbar spine w/o contrast", "amount_due": "$1,850.00", "due_date": "11/20/2026"},
+    {"statement_id": "ST-89530", "claim_id": "N/A", "provider": "Bluebonnet Regional Medical Center", "service_date": "10/09/2026", "description": "Physical therapy evaluation", "amount_due": "$180.00", "due_date": "11/25/2026"}
+  ],
+  "eobs": [
+    {"claim_id": "CLM-1001", "provider": "Bluebonnet Regional Medical Center", "service_date": "Sep 14, 2026", "description": "Emergency room visit", "billed": "$2,480.00", "patient_responsibility": "$40.00", "status": "Paid", "processed_date": "Oct 1, 2026"},
+    {"claim_id": "CLM-1002", "provider": "Bluebonnet Regional Medical Center", "service_date": "Sep 14, 2026", "description": "Laboratory", "billed": "$180.00", "patient_responsibility": "$25.00", "status": "Paid", "processed_date": "Oct 1, 2026"},
+    {"claim_id": "CLM-1003", "provider": "Bluebonnet Regional Medical Center", "service_date": "Oct 2, 2026", "description": "Advanced imaging (MRI)", "billed": "$1,850.00", "patient_responsibility": "$1,850.00", "status": "Denied", "processed_date": "Oct 12, 2026", "denial_reason": "Prior authorization not on file"}
+  ]
+}

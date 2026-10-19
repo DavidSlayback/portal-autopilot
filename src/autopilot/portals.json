@@ -1,0 +1,38 @@
+[
+  {
+    "id": "bluebonnet",
+    "name": "Bluebonnet Regional Medical Center",
+    "login_url": "https://davidslayback.github.io/portal-autopilot/hospital/",
+    "sender_domains": ["bluebonnet-health.example"],
+    "link_domains": ["davidslayback.github.io"],
+    "senders": [],
+    "aliases": ["bluebonnet"]
+  },
+  {
+    "id": "prairie",
+    "name": "Prairie Mutual Health",
+    "login_url": "https://davidslayback.github.io/portal-autopilot/insurer/",
+    "sender_domains": ["prairiemutual.example"],
+    "link_domains": ["davidslayback.github.io"],
+    "senders": [],
+    "aliases": ["prairie mutual"]
+  },
+  {
+    "id": "cedarhollow",
+    "name": "Cedar Hollow Credit Union",
+    "login_url": "https://davidslayback.github.io/portal-autopilot/bank/",
+    "sender_domains": ["cedarhollowcu.example"],
+    "link_domains": ["davidslayback.github.io", "cedarhollowcu.example"],
+    "senders": [],
+    "aliases": ["cedar hollow"]
+  },
+  {
+    "id": "mychart",
+    "name": "MyChart",
+    "login_url": "https://EDIT-ME/MyChart/",
+    "sender_domains": ["EDIT-ME.org"],
+    "link_domains": ["EDIT-ME.org", "mychart.org", "epic.com", "apps.apple.com", "play.google.com"],
+    "senders": [],
+    "aliases": ["mychart"]
+  }
+]

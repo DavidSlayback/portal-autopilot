@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bluebonnet Patient Gateway</title>
+<style>
+  /* Deliberately dated look: this is the "old portal" in the demo. */
+  :root { --bg: #e8eef7; --panel: #fff; --fg: #000; --bar: #1f3f7a; --line: #8aa0c8; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg: #0f1a2c; --panel: #17243a; --fg: #e6ecf5; --bar: #2a4f93; --line: #3b5684; } }
+  body { background: var(--bg); color: var(--fg); font: 14px "Times New Roman", serif; margin: 0; }
+  header { background: var(--bar); color: #fff; padding: 8px 16px; font: bold 18px Verdana, sans-serif; }
+  header small { font-weight: normal; font-size: 11px; display: block; }
+  main { max-width: 860px; margin: 12px auto; padding: 0 16px; }
+  fieldset, section { background: var(--panel); border: 2px groove var(--line); margin-bottom: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { border: 1px solid var(--line); padding: 3px 6px; text-align: left; }
+  th { background: var(--bar); color: #fff; }
+  .wrap { overflow-x: auto; }
+  textarea { width: 100%; box-sizing: border-box; }
+  #err { color: #c00; } pre { white-space: pre-wrap; font: 12px monospace; }
+  .note { font-size: 11px; font-style: italic; }
+</style>
+</head>
+<body>
+<header>BLUEBONNET REGIONAL MEDICAL CENTER &mdash; Patient Gateway
+  <small>Fictional demo portal. Best viewed in Internet Explorer 8 or higher.</small></header>
+<main>
+<form id="login">
+  <fieldset><legend>Secure Login</legend>
+    <p>Username: <input name="user" autocomplete="username"></p>
+    <p>Password: <input name="pass" type="password" autocomplete="current-password"></p>
+    <p><input type="submit" value="Sign In"> <span id="err" hidden>Invalid username or password.</span></p>
+  </fieldset>
+</form>
+
+<div id="app" hidden>
+  <p>Welcome, <b>ALEX RIVERA</b> (MRN 00418277) &nbsp; <button id="logout" type="button">Log Out</button></p>
+
+  <section><h3>&raquo; Inbox (1 unread)</h3>
+    <table><tr><th>Date</th><th>From</th><th>Subject</th></tr>
+      <tr><td>10/18/2026</td><td>Patient Financial Services</td>
+          <td><b>Your new statement is available</b> &mdash; 4 open items totaling $2,467.00</td></tr>
+    </table>
+  </section>
+
+  <section><h3>&raquo; Account Statements</h3>
+    <div class="wrap"><table id="statements">
+      <tr><th>Statement #</th><th>Date of Service</th><th>Description</th><th>Insurance Claim #</th>
+          <th>Amount Due</th><th>Due Date</th></tr>
+      <tr><td>ST-88412</td><td>09/14/2026</td><td>Emergency department visit</td><td>CLM-1001</td><td>$412.00</td><td>11/14/2026</td></tr>
+      <tr><td>ST-88413</td><td>09/14/2026</td><td>Comprehensive metabolic panel</td><td>CLM-1002</td><td>$25.00</td><td>11/14/2026</td></tr>
+      <tr><td>ST-89107</td><td>10/02/2026</td><td>MRI lumbar spine w/o contrast</td><td>CLM-1003</td><td>$1,850.00</td><td>11/20/2026</td></tr>
+      <tr><td>ST-89530</td><td>10/09/2026</td><td>Physical therapy evaluation</td><td>N/A</td><td>$180.00</td><td>11/25/2026</td></tr>
+    </table></div>
+    <p class="note">Balances reflect insurance adjustments received to date. Pay online is temporarily unavailable; please call during business hours.</p>
+  </section>
+
+  <section><h3>&raquo; Message the Billing Office</h3>
+    <form id="compose">
+      <p>Subject: <input name="subject" size="50" required></p>
+      <p><textarea name="body" rows="8" required></textarea></p>
+      <p><input type="submit" value="Send Message"> <b id="confirm"></b></p>
+    </form>
+    <h4>Sent Messages</h4><ul id="sent"></ul>
+  </section>
+</div>
+</main>
+<script src="../portal.js"></script>
+<script>portal('bluebonnet', 'alex.rivera', 'bluebonnet-demo');</script>
+</body>
+</html>

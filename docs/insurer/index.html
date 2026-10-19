@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prairie Mutual Member Center</title>
+<style>
+  :root { --bg: #f6f4ef; --card: #fff; --fg: #23201b; --muted: #6d665a; --accent: #8a5a12; --line: #e3ddd0; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg: #1b1915; --card: #25221d; --fg: #f1ece2; --muted: #b3aa99; --accent: #e0a64a; --line: #3a352c; } }
+  body { background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, sans-serif; margin: 0; }
+  header { padding: 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; }
+  header b { color: var(--accent); }
+  main { max-width: 720px; margin: 0 auto; padding: 16px; }
+  form#login, details { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+  label { display: block; margin-bottom: 8px; } input { width: 100%; padding: 8px; box-sizing: border-box; }
+  summary { cursor: pointer; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .status { font-size: 13px; padding: 1px 8px; border-radius: 99px; border: 1px solid var(--line); }
+  .denied { color: #b3261e; border-color: currentColor; }
+  dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; margin: 12px 0 0; }
+  dt { color: var(--muted); } dd { margin: 0; }
+  #err { color: #b3261e; } small { color: var(--muted); }
+</style>
+</head>
+<body>
+<header><span><b>Prairie Mutual</b> Health · Member Center</span><small>Fictional demo portal</small></header>
+<main>
+<form id="login">
+  <label>Member ID <input name="user" autocomplete="username"></label>
+  <label>Password <input name="pass" type="password" autocomplete="current-password"></label>
+  <button>Sign in</button> <span id="err" hidden>We couldn't sign you in.</span>
+</form>
+
+<div id="app" hidden>
+  <p>Hi Alex · Member ID PMH-447120 · <button id="logout" type="button">Sign out</button></p>
+  <h2>Claims &amp; Explanation of Benefits</h2>
+  <p><small>This is not a bill. Your provider may bill you up to "You may owe".</small></p>
+
+  <details open><summary><span>Bluebonnet Regional Medical Center · Emergency room visit</span><span class="status">Paid</span></summary>
+    <dl><dt>Claim</dt><dd>CLM-1001</dd><dt>Date of service</dt><dd>Sep 14, 2026</dd>
+        <dt>Billed</dt><dd>$2,480.00</dd><dt>Plan discount</dt><dd>$1,840.00</dd><dt>Plan paid</dt><dd>$600.00</dd>
+        <dt>You may owe</dt><dd><b>$40.00</b> (ER copay)</dd><dt>Processed</dt><dd>Oct 1, 2026</dd></dl></details>
+
+  <details><summary><span>Bluebonnet Regional Medical Center · Laboratory</span><span class="status">Paid</span></summary>
+    <dl><dt>Claim</dt><dd>CLM-1002</dd><dt>Date of service</dt><dd>Sep 14, 2026</dd>
+        <dt>Billed</dt><dd>$180.00</dd><dt>Plan discount</dt><dd>$85.00</dd><dt>Plan paid</dt><dd>$70.00</dd>
+        <dt>You may owe</dt><dd><b>$25.00</b></dd><dt>Processed</dt><dd>Oct 1, 2026</dd></dl></details>
+
+  <details><summary><span>Bluebonnet Regional Medical Center · Advanced imaging (MRI)</span><span class="status denied">Denied</span></summary>
+    <dl><dt>Claim</dt><dd>CLM-1003</dd><dt>Date of service</dt><dd>Oct 2, 2026</dd>
+        <dt>Billed</dt><dd>$1,850.00</dd><dt>Plan paid</dt><dd>$0.00</dd>
+        <dt>You may owe</dt><dd><b>$1,850.00</b></dd><dt>Processed</dt><dd>Oct 12, 2026</dd>
+        <dt>Reason</dt><dd>Prior authorization not on file. You may appeal within 180 days of this notice.</dd></dl></details>
+</div>
+</main>
+<script src="../portal.js"></script>
+<script>portal('prairie', 'PMH-447120', 'prairie-demo');</script>
+</body>
+</html>

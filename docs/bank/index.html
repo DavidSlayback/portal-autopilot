@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cedar Hollow Online Banking</title>
+<style>
+  :root { --bg: #eef5f3; --card: #fff; --fg: #10302a; --muted: #4f6f68; --accent: #0f6b5c; --line: #cfe2dd; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg: #0c1a17; --card: #13261f; --fg: #e3f1ed; --muted: #9fbdb5; --accent: #4fc1aa; --line: #23413a; } }
+  body { background: var(--bg); color: var(--fg); font: 15px/1.5 Georgia, serif; margin: 0; }
+  header { background: var(--accent); color: #fff; padding: 14px 16px; }
+  main { max-width: 680px; margin: 0 auto; padding: 16px; }
+  form#login, article { background: var(--card); border-left: 4px solid var(--accent); padding: 14px 16px; margin-bottom: 12px; }
+  label { display: block; margin-bottom: 8px; } input { width: 100%; padding: 8px; box-sizing: border-box; }
+  h3 { margin: 0 0 4px; } .meta { color: var(--muted); font-size: 13px; }
+  #err { color: #b3261e; }
+</style>
+</head>
+<body>
+<header>Cedar Hollow Credit Union · Secure Message Center <small>(fictional demo)</small></header>
+<main>
+<form id="login">
+  <label>Username <input name="user" autocomplete="username"></label>
+  <label>Password <input name="pass" type="password" autocomplete="current-password"></label>
+  <button>Log in</button> <span id="err" hidden>Login failed.</span>
+</form>
+
+<div id="app" hidden>
+  <p>Member: Alex Rivera · Checking ••4471 · <button id="logout" type="button">Log out</button></p>
+
+  <article><h3>Scheduled bill payment confirmed</h3>
+    <p class="meta">Received 10/18/2026 · From: Bill Pay</p>
+    <p>A payment of <b>$412.00</b> to <b>Bluebonnet Regional Medical Center</b> (account ST-88412)
+       is scheduled from Checking ••4471 on <b>11/14/2026</b>. To change or cancel it, edit the payment
+       in Bill Pay before 11/13/2026 at 5:00 PM CT.</p></article>
+
+  <article><h3>Your October statement is available</h3>
+    <p class="meta">Received 10/05/2026 · From: Statements</p>
+    <p>Checking ••4471, statement period 09/01/2026 – 09/30/2026. Ending balance $3,218.44.</p></article>
+</div>
+</main>
+<script src="../portal.js"></script>
+<script>portal('cedarhollow', 'alexr', 'cedar-demo');</script>
+</body>
+</html>

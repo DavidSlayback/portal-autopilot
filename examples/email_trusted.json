@@ -1,0 +1,9 @@
+{
+  "from_name": "Bluebonnet Regional Billing",
+  "from_address": "billing@bluebonnet-health.example",
+  "subject": "You have a new statement. Log in to view.",
+  "auth": "spf=pass dkim=pass dmarc=pass",
+  "links": [
+    {"text": "Log in to view", "href": "https://davidslayback.github.io/portal-autopilot/hospital/"}
+  ]
+}

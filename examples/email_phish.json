@@ -1,0 +1,9 @@
+{
+  "from_name": "Cedar Hollow CU Secure Message",
+  "from_address": "secure.message.center@gmail.com",
+  "subject": "New secure message: verify your account to avoid suspension",
+  "auth": "spf=pass dkim=pass dmarc=none",
+  "links": [
+    {"text": "cedarhollowcu.example/secure", "href": "https://cedarhollow-cu-secure.com/login"}
+  ]
+}
