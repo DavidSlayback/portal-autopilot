@@ -41,10 +41,10 @@
   .legend span::before { content: ""; display: inline-block; width: 14px; height: 14px; border-radius: 3px;
                          margin-right: 7px; vertical-align: -2px; border: 2px solid var(--c); background: var(--b); }
 
-  .found { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 10px; }
+  .found { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 10px; }
   .found div { background: var(--panel); border: 1px solid var(--line); border-left: 5px solid var(--stop);
-               border-radius: 8px; padding: 10px 12px; font-size: 15px; line-height: 1.35; }
-  .found b { display: block; font-size: 24px; font-weight: 800; }
+               border-radius: 8px; padding: 9px 10px; font-size: 14px; line-height: 1.32; }
+  .found b { display: block; font-size: 22px; font-weight: 800; }
 
   footer { grid-column: 1 / -1; background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
            padding: 10px 20px; display: grid; grid-template-columns: 1fr auto; gap: 6px 32px; }
@@ -76,8 +76,8 @@
        look-alike domains. It never opens the emailed link. <b>Clerk</b> logs into the real portal
        at its registered address, files the document, and puts the deadline on your calendar.</p>
     <p>Then it compares the hospital bill with the insurer’s EOB, claim by claim, in code. Here that
-       found $372 you don’t owe and a $412 autopay about to go out. Clerk drafts the dispute and
-       sends it only after you approve.</p>
+       found $372 you don’t owe, a $412 autopay about to go out, and the hospital’s proof that the
+       MRI denial is wrong. Clerk drafts the dispute and the appeal, and sends only after you approve.</p>
     <p class="close">Your inbox says “log in to view.” Portal Autopilot logs in, reads it, and catches
        what you don’t owe.</p>
   </section>
@@ -160,7 +160,7 @@
       <text x="56" y="446" class="t">You approve</text>
       <path class="edge" d="M107,386 V410"/>
       <path class="edge" d="M212,440 H560 Q676,440 676,278"/>
-      <text x="240" y="430" class="lbl">letter sent through the hospital portal</text>
+      <text x="240" y="430" class="lbl">dispute → hospital portal · appeal → insurer portal</text>
     </svg>
     <div class="legend" aria-label="Legend">
       <span style="--c: var(--untrusted); --b: var(--untrusted-bg)">untrusted input</span>
@@ -173,8 +173,9 @@
     <div class="found" aria-label="What the demo finds">
       <div><b>$372</b>overbilled: bill says $412, EOB says you owe $40</div>
       <div><b>$412</b>autopay scheduled for 11/14; edit before 11/13</div>
-      <div><b>MRI denied</b>appeal drafted; $1,850 on hold</div>
+      <div><b>$1,850</b>MRI denied as "no prior auth", but the hospital shows PA-55120: appeal cites it</div>
       <div><b>$180</b>bill never sent to insurance</div>
+      <div><b>1 attack</b>bank message told AI agents to change the payee: reported, ignored</div>
     </div>
   </section>
 
