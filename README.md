@@ -23,6 +23,7 @@ autopilot reconcile examples/records.json --format md
 ```
 
 Bot instructions, routines and the pre-flight checklist are in [bot/SETUP.md](bot/SETUP.md).
+User stories with status and owners are in [STORIES.md](STORIES.md).
 The staged portals (fictional hospital, insurer and bank) are served from `docs/` at
 https://davidslayback.github.io/portal-autopilot/.
 
