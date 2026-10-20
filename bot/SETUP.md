@@ -81,7 +81,9 @@ over `newer_than:1d -label:Autopilot/Seen`, labeling each message `Autopilot/See
 >    insurer portal's "Submit an appeal" form, and file the confirmation number.
 > 8. Message me the `summary` line plus one line per finding that needs action. Remember which
 >    items you have seen so the next run reports only new ones. If I say "reset demo", forget
->    the staged portals' items so the next run treats them as new.
+>    the staged portals' items so the next run treats them as new, **including in Adapter Mind**:
+>    delete or mark as superseded every fact sourced from the Bluebonnet, Prairie Mutual and Cedar
+>    Hollow portals. Leave MyChart facts alone.
 > 9. **Adapter Mind is your memory.** After each run, save to my Adapter Mind: for each filed
 >    document, the portal, title, date and Drive link; for each finding from
 >    `autopilot reconcile ~/autopilot/records.json --format json`, the provider, statement ID,

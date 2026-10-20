@@ -39,7 +39,7 @@ Put your name in **Owner** when you take one.
 
 | # | Story | Done when | Status | Owner |
 |---|---|---|---|---|
-| 8 | **Feed for other agents.** As Claude Code, I can read every document, amount and deadline without logging in anywhere. | Clerk writes `ledger.json` to Drive after each run, and another agent answers "what's due this week?" from it. | `todo` | |
+| 8 | **Memory other agents can ask.** As Claude Code (or me), I can ask "what's due?" without logging in anywhere. | Clerk saves every filed document and finding to Adapter Mind as a sourced fact, uses it to remember what it has seen, and answers "what's due / on hold / disputed" from it. Sentry never touches the Mind. "Reset demo" clears the staged portals' facts. | `prompt` | Jess |
 | 9 | **Learn a new portal from one email.** As Alex, I forward a notification from a portal the Bot has never seen, and it learns that portal. | It saves a skill and a registry entry for me to confirm. Pre-recorded only. | `todo` | |
 
 ## Demo order (about 3 minutes, plus 2 for questions)
