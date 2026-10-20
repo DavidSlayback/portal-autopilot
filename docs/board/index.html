@@ -64,7 +64,7 @@
 <div class="stage" id="stage">
   <header>
     <h1>Portal Autopilot</h1>
-    <p>Every “log in to view” email, handled by two Grok Bots.</p>
+    <p>Every “log in to view” email, handled by three Grok Bots.</p>
   </header>
 
   <section class="talk" aria-label="60-second talk track">
@@ -78,8 +78,8 @@
     <p>Then it compares the hospital bill with the insurer’s EOB, claim by claim, in code. Here that
        found $372 you don’t owe, a $412 autopay about to go out, and the hospital’s proof that the
        MRI denial is wrong. Clerk drafts the dispute and the appeal, and sends only after you approve.</p>
-    <p>Everything Clerk learns goes into your <b>Adapter Mind</b>, so you or any other agent can ask
-       “what’s due?” without logging in anywhere.</p>
+    <p>Everything Clerk learns goes into your <b>Adapter Mind</b>. <b>Concierge</b> has no email
+       and no portals. It reads only the facts Clerk filed there, and still answers “what’s due?”</p>
     <p class="close">Your inbox says “log in to view.” Portal Autopilot logs in, reads it, and catches
        what you don’t owe.</p>
   </section>
@@ -148,7 +148,11 @@
       <text x="604" y="361" class="s">every document and</text>
       <text x="604" y="379" class="s">deadline, with sources</text>
       <path class="edge" d="M508,346 H586"/>
-      <text x="776" y="410" class="lbl" text-anchor="end">other agents ask “what’s due?”</text>
+      <path class="edge" d="M683,390 V410"/>
+      <text x="692" y="405" class="lbl">tagged facts</text>
+      <rect x="590" y="414" width="186" height="52" rx="10" fill="var(--gate-bg)" stroke="var(--gate)" stroke-width="2"/>
+      <text x="604" y="437" class="t">Concierge Bot</text>
+      <text x="604" y="457" class="s">reads only Clerk’s facts</text>
 
       <!-- Auto outputs -->
       <rect x="2" y="150" width="210" height="100" rx="10" fill="var(--out-bg)" stroke="var(--out)" stroke-width="2"/>
@@ -198,7 +202,7 @@
       <li>money math is code, not the model</li>
       <li>nothing is sent or changed without your OK</li>
       <li>text inside portals is data, never instructions</li>
-      <li>only Clerk writes to your Mind</li>
+      <li>only Clerk writes to your Mind; Concierge only reads Clerk’s facts</li>
     </ul>
     <p class="next" style="margin:0"><b>Next:</b> per-agent read permissions on your Mind ·
        learn a new portal from one forwarded email · nightly check of portals that never email</p>
