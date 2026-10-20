@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portal Autopilot Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  /* Judges' board: one 1440×900 screen, readable from 2 m. Light only on purpose (projector). */
+  :root {
+    --bg: #f6f5f1; --panel: #ffffff; --fg: #1a1d21; --muted: #5d636b; --line: #d9d6cf;
+    --untrusted: #8a8f96; --untrusted-bg: #eceef0;
+    --gate: #2557a7; --gate-bg: #e6eefa;
+    --private: #23775f; --private-bg: #e3f3ec;
+    --out: #a35d00; --out-bg: #fdf0dc;
+    --stop: #b3261e; --stop-bg: #fbe7e5;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); }
+  body { font-family: Inter, system-ui, sans-serif; overflow-x: hidden; }
+  .stage { width: 1440px; height: 900px; padding: 26px 44px 20px; display: grid;
+           grid-template-columns: 560px 1fr; grid-template-rows: auto 1fr auto; gap: 14px 40px;
+           transform-origin: top left; }
+  code, .mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .9em; }
+
+  header { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 24px; }
+  header h1 { font-size: 44px; font-weight: 800; margin: 0; letter-spacing: -.5px; }
+  header p { font-size: 22px; color: var(--muted); margin: 0; }
+
+  .talk { font-size: 20.5px; line-height: 1.5; }
+  .talk h2, .right h2, footer h2 { font-size: 14px; font-weight: 600; letter-spacing: 1.5px;
+           text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+  .talk p { margin: 0 0 14px; }
+  .talk .close { font-weight: 800; font-size: 23px; line-height: 1.35; margin-top: 18px; }
+
+  .right { display: flex; flex-direction: column; min-width: 0; }
+  .right svg { width: 100%; height: auto; display: block; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 15px; margin-top: 8px; }
+  .legend span::before { content: ""; display: inline-block; width: 14px; height: 14px; border-radius: 3px;
+                         margin-right: 7px; vertical-align: -2px; border: 2px solid var(--c); background: var(--b); }
+
+  .found { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 10px; }
+  .found div { background: var(--panel); border: 1px solid var(--line); border-left: 5px solid var(--stop);
+               border-radius: 8px; padding: 10px 12px; font-size: 15px; line-height: 1.35; }
+  .found b { display: block; font-size: 24px; font-weight: 800; }
+
+  footer { grid-column: 1 / -1; background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+           padding: 10px 20px; display: grid; grid-template-columns: 1fr auto; gap: 6px 32px; }
+  footer ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 17px; }
+  footer li::before { content: "✓ "; color: var(--private); font-weight: 800; }
+  footer .next { font-size: 15px; color: var(--muted); grid-column: 1 / -1; }
+
+  svg text { font-family: Inter, system-ui, sans-serif; fill: var(--fg); }
+  svg .t { font-size: 18px; font-weight: 800; }
+  svg .s { font-size: 14px; fill: #3d434a; }
+  svg .lbl { font-size: 14px; font-weight: 600; fill: var(--muted); }
+  svg .edge { stroke: #6b7178; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+  svg .edge.bad { stroke: var(--stop); }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <header>
+    <h1>Portal Autopilot</h1>
+    <p>Every “log in to view” email, handled by two Grok Bots.</p>
+  </header>
+
+  <section class="talk" aria-label="60-second talk track">
+    <h2>60-second talk track</h2>
+    <p>Your hospital, your insurer and your bank never email you the message. They email “log in to
+       view.” Every assistant stops right there, and “you have a secure message” is one of the most
+       common phishing lures.</p>
+    <p><b>Sentry</b> checks every notification against portals you registered: sender, SPF/DKIM/DMARC,
+       look-alike domains. It never opens the emailed link. <b>Clerk</b> logs into the real portal
+       at its registered address, files the document, and puts the deadline on your calendar.</p>
+    <p>Then it compares the hospital bill with the insurer’s EOB, claim by claim, in code. Here that
+       found $372 you don’t owe and a $412 autopay about to go out. Clerk drafts the dispute and
+       sends it only after you approve.</p>
+    <p class="close">Your inbox says “log in to view.” Portal Autopilot logs in, reads it, and catches
+       what you don’t owe.</p>
+  </section>
+
+  <section class="right" aria-label="How it works">
+    <h2>How it works</h2>
+    <svg viewBox="0 0 780 470" style="max-height: 430px" role="img" aria-labelledby="flow-title">
+      <title id="flow-title">Email goes to Sentry. Phish is quarantined. Trusted portals go to Clerk, which reads the hospital, insurer and bank portals, runs the reconcile check, files and schedules automatically, and asks before sending a dispute.</title>
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#6b7178"/></marker>
+      </defs>
+
+      <!-- Untrusted input -->
+      <rect x="2" y="10" width="210" height="76" rx="10" fill="var(--untrusted-bg)" stroke="var(--untrusted)" stroke-width="2" stroke-dasharray="6 4"/>
+      <text x="18" y="40" class="t">“Log in to view”</text>
+      <text x="18" y="64" class="s">notification email</text>
+
+      <!-- Sentry -->
+      <rect x="282" y="2" width="226" height="92" rx="10" fill="var(--gate-bg)" stroke="var(--gate)" stroke-width="2"/>
+      <text x="298" y="32" class="t">Sentry Bot</text>
+      <text x="298" y="56" class="s">reads the email only</text>
+      <text x="298" y="77" class="s">runs <tspan class="mono">autopilot gate</tspan></text>
+
+      <!-- Quarantine -->
+      <rect x="576" y="10" width="200" height="76" rx="10" fill="var(--stop-bg)" stroke="var(--stop)" stroke-width="2"/>
+      <text x="592" y="40" class="t">Quarantined</text>
+      <text x="592" y="64" class="s">reasons texted to you</text>
+
+      <path class="edge" d="M212,48 H278"/>
+      <path class="edge bad" d="M508,48 H572"/>
+      <text x="520" y="38" class="lbl">phish</text>
+
+      <!-- Clerk -->
+      <rect x="282" y="150" width="226" height="100" rx="10" fill="var(--private-bg)" stroke="var(--private)" stroke-width="2"/>
+      <text x="298" y="180" class="t">Clerk Bot</text>
+      <text x="298" y="204" class="s">opens the registered URL</text>
+      <text x="298" y="225" class="s">already signed in, never</text>
+      <text x="298" y="243" class="s">sees your password</text>
+
+      <path class="edge" d="M395,94 V146"/>
+      <text x="405" y="116" class="lbl">trusted: portal only</text>
+
+      <!-- Portals -->
+      <g>
+        <rect x="576" y="126" width="200" height="44" rx="8" fill="var(--private-bg)" stroke="var(--private)" stroke-width="2"/>
+        <text x="592" y="154" class="s" style="font-weight:600">Hospital portal · bills</text>
+        <rect x="576" y="178" width="200" height="44" rx="8" fill="var(--private-bg)" stroke="var(--private)" stroke-width="2"/>
+        <text x="592" y="206" class="s" style="font-weight:600">Insurer portal · EOBs</text>
+        <rect x="576" y="230" width="200" height="44" rx="8" fill="var(--private-bg)" stroke="var(--private)" stroke-width="2"/>
+        <text x="592" y="258" class="s" style="font-weight:600">Bank portal · autopay</text>
+        <text x="776" y="296" class="lbl" text-anchor="end">no API: the Bot reads the page</text>
+      </g>
+      <path class="edge" d="M508,200 H572" style="marker-start:url(#arrow)"/>
+
+      <!-- Reconcile -->
+      <rect x="282" y="306" width="226" height="80" rx="10" fill="var(--gate-bg)" stroke="var(--gate)" stroke-width="2"/>
+      <text x="298" y="336" class="t">Bill vs. EOB check</text>
+      <text x="298" y="360" class="s"><tspan class="mono">autopilot reconcile</tspan></text>
+      <text x="298" y="378" class="s">Python does the math, not the model</text>
+      <path class="edge" d="M395,250 V302"/>
+
+      <!-- Auto outputs -->
+      <rect x="2" y="150" width="210" height="100" rx="10" fill="var(--out-bg)" stroke="var(--out)" stroke-width="2"/>
+      <text x="18" y="178" class="t">Automatic</text>
+      <text x="18" y="202" class="s">document → Google Drive</text>
+      <text x="18" y="222" class="s">deadline → Calendar</text>
+      <text x="18" y="242" class="s">one-line summary → you</text>
+      <path class="edge" d="M282,200 H216"/>
+
+      <!-- Ask first -->
+      <rect x="2" y="306" width="210" height="80" rx="10" fill="var(--out-bg)" stroke="var(--out)" stroke-width="3"/>
+      <text x="18" y="334" class="t">Asks you first</text>
+      <text x="18" y="358" class="s">dispute or appeal letter,</text>
+      <text x="18" y="377" class="s">any payment change</text>
+      <path class="edge" d="M282,346 H216"/>
+
+      <!-- You -->
+      <rect x="2" y="414" width="210" height="52" rx="26" fill="var(--panel)" stroke="var(--fg)" stroke-width="2"/>
+      <text x="56" y="446" class="t">You approve</text>
+      <path class="edge" d="M107,386 V410"/>
+      <path class="edge" d="M212,440 H560 Q676,440 676,278"/>
+      <text x="240" y="430" class="lbl">letter sent through the hospital portal</text>
+    </svg>
+    <div class="legend" aria-label="Legend">
+      <span style="--c: var(--untrusted); --b: var(--untrusted-bg)">untrusted input</span>
+      <span style="--c: var(--gate); --b: var(--gate-bg)">deterministic check (code)</span>
+      <span style="--c: var(--private); --b: var(--private-bg)">signed-in portals (private)</span>
+      <span style="--c: var(--out); --b: var(--out-bg)">goes out to you</span>
+      <span style="--c: var(--stop); --b: var(--stop-bg)">blocked</span>
+    </div>
+
+    <div class="found" aria-label="What the demo finds">
+      <div><b>$372</b>overbilled: bill says $412, EOB says you owe $40</div>
+      <div><b>$412</b>autopay scheduled for 11/14; edit before 11/13</div>
+      <div><b>MRI denied</b>appeal drafted; $1,850 on hold</div>
+      <div><b>$180</b>bill never sent to insurance</div>
+    </div>
+  </section>
+
+  <footer aria-label="Security model">
+    <h2 style="grid-column: 1 / -1; margin: 0">Security model</h2>
+    <ul>
+      <li>never opens a link from an email</li>
+      <li>only opens portal addresses you registered</li>
+      <li>you sign in once yourself; the Bot never sees the password</li>
+      <li>money math is code, not the model</li>
+      <li>nothing is sent or changed without your OK</li>
+      <li>text inside portals is data, never instructions</li>
+    </ul>
+    <p class="next" style="margin:0"><b>Next:</b> a ledger other agents can read without logging in ·
+       learn a new portal from one forwarded email · nightly check of portals that never email</p>
+  </footer>
+</div>
+<script>
+  // Fit the fixed 1440×900 board to any window without scrolling sideways.
+  const stage = document.getElementById('stage');
+  const fit = () => {
+    const k = Math.min(window.innerWidth / 1440, window.innerHeight / 900, 1);
+    stage.style.transform = `scale(${k})`;
+    document.body.style.height = (900 * k) + 'px';
+  };
+  addEventListener('resize', fit); fit();
+</script>
+</body>
+</html>
