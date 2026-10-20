@@ -52,6 +52,9 @@ Put your name in **Owner** when you take one.
    change the payee. Clerk reported it and did nothing."
 5. **Approve live (5, 11).** Approve the appeal, and the confirmation appears in the insurer portal.
 6. **Persistent (6, 7).** Show the 7 AM routine and the signed-in MyChart session (metadata only).
+7. **Memory (8).** Ask Concierge, which has no email or portal access: "What do I owe this week,
+   and what's on hold?" It answers from Clerk's `[Portal Autopilot]` facts in Adapter Mind, with
+   sources.
 
 ## Reset between runs
 

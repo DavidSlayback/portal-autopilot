@@ -1,8 +1,9 @@
 # Grok Bot setup
 
-Two Bots, one shared Grok Bot computer. The split gives each Bot a clear job. It is not
-isolation: both Bots share the same browser and saved logins. The safety comes from the
-no-click rule and from the deterministic `autopilot gate` check.
+Three Bots. Sentry and Clerk share one Grok Bot computer: the split gives each a clear job, but
+it is not isolation, since they share the same browser and saved logins. The safety comes from
+the no-click rule and from the deterministic `autopilot gate` check. Concierge has no computer,
+email or portal access; it only reads Clerk's `[Portal Autopilot]` facts in Adapter Mind.
 
 ## 1. Computer (once)
 
