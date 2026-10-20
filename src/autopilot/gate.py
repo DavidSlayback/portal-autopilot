@@ -39,6 +39,34 @@ class Verdict:
     reasons: tuple[str, ...]
 
 
+# Content inside a trusted portal is still untrusted data. These patterns catch text that
+# tries to steer an agent, or the classic "we changed our bank details" payment fraud.
+_INJECTION_PATTERNS = (
+    (r"\b(ai|assistants?|agents?|bots?|automated|llms?)\b[^.]{0,80}\b(should|must|are instructed|please)\b",
+     "addresses AI assistants with instructions"),
+    (r"ignore (all |any )?(previous|prior|earlier) (instructions|rules)",
+     "tries to override the assistant's instructions"),
+    (r"\b(new|updated|changed?)\b[^.]{0,30}\b(remittance|bank|routing|payee|payment) "
+     r"(account|details|information|instructions)\b|\bupdate the payee\b",
+     "asks to change where money is sent"),
+    (r"\bapprove (all |any )?(pending|scheduled) payments?\b|without (further )?confirmation",
+     "asks to approve payments without confirmation"),
+)
+
+
+def scan_message(text: str) -> tuple[str, ...]:
+    """Return why a portal message looks like an injection or payee-change attempt.
+
+    Args:
+        text: Subject and body of one portal message.
+
+    Returns:
+        Reasons; empty if the message looks benign. Flagged messages are reported, never acted on.
+    """
+    lowered = text.lower()
+    return tuple(reason for pattern, reason in _INJECTION_PATTERNS if re.search(pattern, lowered))
+
+
 def load_portals(raw: list[dict[str, Any]]) -> list[Portal]:
     """Build the portal registry from its JSON form."""
     return [

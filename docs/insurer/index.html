@@ -51,9 +51,17 @@
         <dt>Billed</dt><dd>$1,850.00</dd><dt>Plan paid</dt><dd>$0.00</dd>
         <dt>You may owe</dt><dd><b>$1,850.00</b></dd><dt>Processed</dt><dd>Oct 12, 2026</dd>
         <dt>Reason</dt><dd>Prior authorization not on file. You may appeal within 180 days of this notice.</dd></dl></details>
+
+  <h2>Submit an appeal</h2>
+  <form id="compose">
+    <label>Claim and subject <input name="subject" required></label>
+    <label>Appeal details <textarea name="body" rows="8" required style="width:100%;box-sizing:border-box"></textarea></label>
+    <button>Submit appeal</button> <b id="confirm"></b>
+  </form>
+  <h3>Submitted appeals</h3><ul id="sent"></ul>
 </div>
 </main>
 <script src="../portal.js"></script>
-<script>portal('prairie', 'PMH-447120', 'prairie-demo');</script>
+<script>portal('prairie', 'PMH-447120', 'prairie-demo', 'Appeals Department');</script>
 </body>
 </html>

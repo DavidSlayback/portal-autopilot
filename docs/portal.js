@@ -6,7 +6,12 @@ function store(op, key, value) {
   catch { return null; }
 }
 
-function portal(key, user, pass) {
+function portal(key, user, pass, recipient = 'Billing Office') {
+  // ?reset clears sent messages between demo runs but keeps the saved login.
+  if (new URLSearchParams(location.search).has('reset')) {
+    try { localStorage.removeItem(key + ':sent'); } catch {}
+    history.replaceState(null, '', location.pathname);
+  }
   const form = document.getElementById('login');
   const app = document.getElementById('app');
   const show = () => { form.hidden = true; app.hidden = false; };
@@ -22,10 +27,10 @@ function portal(key, user, pass) {
     location.reload();
   });
   const compose = document.getElementById('compose');
-  if (compose) messages(key + ':sent', compose);
+  if (compose) messages(key + ':sent', compose, recipient);
 }
 
-function messages(key, compose) {
+function messages(key, compose, recipient) {
   const list = document.getElementById('sent');
   const render = () => {
     const sent = JSON.parse(store('get', key) || '[]');
@@ -46,7 +51,7 @@ function messages(key, compose) {
     store('set', key, JSON.stringify(sent));
     compose.reset();
     document.getElementById('confirm').textContent =
-      `Your message was sent to the Billing Office. Reference number: ${ref}`;
+      `Your message was sent to the ${recipient}. Reference number: ${ref}`;
     render();
   });
   render();

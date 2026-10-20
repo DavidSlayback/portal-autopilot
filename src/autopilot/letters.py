@@ -39,3 +39,29 @@ def draft(finding: Finding, patient: str) -> str | None:
         case _:
             return None
     return f"Re: {ref}\n\n{body}\n\nThank you,\n{patient}"
+
+
+def appeal(finding: Finding, patient: str) -> str | None:
+    """Return an insurer appeal for a denied claim, citing provider-side evidence if found.
+
+    Args:
+        finding: A reconciliation finding.
+        patient: Name to sign the appeal with.
+    """
+    e, a = finding.eob, finding.authorization
+    if finding.kind != "denied" or e is None:
+        return None
+    evidence = (
+        f"{finding.bill.provider}'s records show prior authorization {a.auth_id} for {a.service}, "
+        f"status {a.status}, valid {a.valid_from:%m/%d/%Y} through {a.valid_to:%m/%d/%Y}, which "
+        f"covers the {e.service_date:%m/%d/%Y} date of service. A copy is attached. Please "
+        "reprocess the claim against that authorization."
+        if a else
+        "Please provide the specific clinical criteria used and reconsider the claim; I am "
+        "requesting the supporting records from my provider."
+    )
+    return (
+        f"Re: Appeal of claim {e.claim_id}, date of service {e.service_date:%m/%d/%Y}\n\n"
+        f"I am appealing the denial of claim {e.claim_id} (processed {e.processed_date:%m/%d/%Y}, "
+        f"reason: \"{e.denial_reason or 'none given'}\"). {evidence}\n\nThank you,\n{patient}"
+    )

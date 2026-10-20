@@ -6,8 +6,9 @@ Pure core: parsed records in, findings out. No I/O, no clock; ``today`` is passe
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date, datetime, timedelta
+from collections.abc import Sequence
 from decimal import Decimal
 from typing import Any, Literal
 
@@ -49,6 +50,29 @@ class Bill:
 
 
 @dataclass(frozen=True)
+class Authorization:
+    """A prior authorization as shown on the provider portal's referrals page."""
+
+    auth_id: str
+    provider: str
+    service: str
+    status: str
+    valid_from: date
+    valid_to: date
+
+
+@dataclass(frozen=True)
+class Payment:
+    """A scheduled bank bill payment, as shown in a bank secure message."""
+
+    payee: str
+    reference: str
+    amount: Decimal
+    scheduled_date: date
+    edit_by: date
+
+
+@dataclass(frozen=True)
 class Finding:
     """What the patient should do about one bill, with the evidence behind it."""
 
@@ -59,6 +83,8 @@ class Finding:
     deadline: date
     action: str
     summary: str
+    authorization: Authorization | None = None  # provider-side evidence against a denial
+    autopay: Payment | None = None  # a scheduled payment that pays more than is owed now
 
     @property
     def overcharge(self) -> Decimal:
@@ -133,6 +159,29 @@ def parse_bill(raw: dict[str, Any]) -> Bill:
     )
 
 
+def parse_authorization(raw: dict[str, Any]) -> Authorization:
+    """Build an Authorization from the Bot's loosely typed extraction."""
+    return Authorization(
+        auth_id=str(raw["auth_id"]).strip(),
+        provider=raw["provider"],
+        service=raw.get("service", ""),
+        status=str(raw["status"]).strip().lower(),
+        valid_from=parse_date(raw["valid_from"]),
+        valid_to=parse_date(raw["valid_to"]),
+    )
+
+
+def parse_payment(raw: dict[str, Any]) -> Payment:
+    """Build a Payment from the Bot's loosely typed extraction."""
+    return Payment(
+        payee=raw["payee"],
+        reference=str(raw["reference"]).strip(),
+        amount=parse_money(raw["amount"]),
+        scheduled_date=parse_date(raw["scheduled_date"]),
+        edit_by=parse_date(raw.get("edit_by") or raw["scheduled_date"]),
+    )
+
+
 def classify(bill: Bill, eob: Eob | None) -> Finding:
     """Decide what to do about one bill given its matching EOB, if any.
 
@@ -172,13 +221,66 @@ def classify(bill: Bill, eob: Eob | None) -> Finding:
     )
 
 
-def reconcile(bills: list[Bill], eobs: list[Eob]) -> list[Finding]:
-    """Match every bill to its EOB by claim id and classify it.
+def _same_provider(a: str, b: str) -> bool:
+    return re.sub(r"\W", "", a.lower()) == re.sub(r"\W", "", b.lower())
+
+
+def with_authorization(f: Finding, auths: Sequence[Authorization]) -> Finding:
+    """Attach an approved provider-side authorization that contradicts an auth denial."""
+    if f.kind != "denied" or f.eob is None or "auth" not in f.eob.denial_reason.lower():
+        return f
+    a = next(
+        (a for a in auths
+         if a.status.startswith("approv") and _same_provider(a.provider, f.bill.provider)
+         and a.valid_from <= f.bill.service_date <= a.valid_to),
+        None,
+    )
+    if a is None:
+        return f
+    return replace(
+        f, authorization=a,
+        action=f"hold payment; appeal citing authorization {a.auth_id}",
+        summary=f"{f.summary} But {f.bill.provider} shows authorization {a.auth_id} approved "
+                f"for {a.service} ({a.valid_from:%m/%d}-{a.valid_to:%m/%d/%Y}), covering this "
+                "service: the denial looks wrong.",
+    )
+
+
+def with_autopay(f: Finding, payments: Sequence[Payment]) -> Finding:
+    """Flag a scheduled payment for this bill that pays more than is owed right now.
+
+    Denied and unbilled-to-insurance balances are on hold, so anything scheduled is too much.
+    """
+    owed_now = f.should_owe if f.kind == "overbilled" else Decimal(0)
+    p = next((p for p in payments if p.reference == f.bill.statement_id), None)
+    if f.kind == "ok" or p is None or owed_now is None or p.amount <= owed_now:
+        return f
+    return replace(
+        f, autopay=p, deadline=min(f.deadline, p.edit_by),
+        summary=f"{f.summary} Your bank will autopay ${p.amount} on {p.scheduled_date:%m/%d/%Y}; "
+                f"you owe ${owed_now} now. Edit it by {p.edit_by:%m/%d/%Y}.",
+    )
+
+
+def reconcile(
+    bills: Sequence[Bill],
+    eobs: Sequence[Eob],
+    auths: Sequence[Authorization] = (),
+    payments: Sequence[Payment] = (),
+) -> list[Finding]:
+    """Match every bill to its EOB by claim id, classify it, and add cross-portal evidence.
+
+    Args:
+        bills: Provider statement lines.
+        eobs: Insurer EOBs.
+        auths: Provider-side prior authorizations, used as evidence against auth denials.
+        payments: Scheduled bank payments, checked against what is actually owed.
 
     Returns:
         Findings ordered by deadline, with money-at-stake kinds first on ties.
     """
     by_claim = {e.claim_id: e for e in eobs}
-    findings = [classify(b, by_claim.get(b.claim_id) if b.claim_id else None) for b in bills]
+    base = (classify(b, by_claim.get(b.claim_id) if b.claim_id else None) for b in bills)
+    findings = [with_autopay(with_authorization(f, auths), payments) for f in base]
     urgency = {"overbilled": 0, "denied": 1, "no_claim": 2, "ok": 3}
     return sorted(findings, key=lambda f: (f.deadline, urgency[f.kind]))

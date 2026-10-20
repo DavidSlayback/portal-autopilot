@@ -32,6 +32,25 @@ def test_demo_records_tell_the_demo_story():
     assert report["findings"][0]["statement_id"] == "ST-88412"  # most urgent money first
 
 
+def test_cross_portal_evidence_and_alerts():
+    report = cli.run_reconcile(_example("records.json"))
+    by_stmt = {f["statement_id"]: f for f in report["findings"]}
+
+    # Hospital-side prior auth contradicts the insurer's "not on file" denial.
+    mri = by_stmt["ST-89107"]
+    assert mri["authorization"] == "PA-55120"
+    assert "PA-55120" in mri["appeal"] and "10/02/2026" in mri["appeal"]
+    # Bank autopay pays $412 against a bill where only $40 is owed; deadline moves to edit cutoff.
+    er = by_stmt["ST-88412"]
+    assert er["autopay_warning"].startswith("Scheduled $412.00")
+    assert er["deadline"] == "2026-11-13"
+    assert "Autopay of $412.00" in report["summary"]
+    # Only the planted payee-change message is flagged; routine bank mail is not.
+    assert [a["subject"] for a in report["alerts"]] == ["Payee update notice"]
+    assert {"addresses AI assistants with instructions", "asks to change where money is sent",
+            "asks to approve payments without confirmation"} <= set(report["alerts"][0]["reasons"])
+
+
 @pytest.mark.parametrize(
     ("raw", "expected"),
     [("$1,850.00", Decimal("1850.00")), (40, Decimal("40.00")), ("(12.50)", Decimal("-12.50"))],

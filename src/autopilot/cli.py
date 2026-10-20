@@ -43,12 +43,20 @@ def run_gate(email: dict[str, Any], portals: list[gate.Portal]) -> dict[str, Any
 
 
 def run_reconcile(records: dict[str, Any]) -> dict[str, Any]:
-    """Return findings, letters and a one-line summary as JSON-ready data."""
+    """Return findings, letters, alerts and a one-line summary as JSON-ready data."""
     patient = records.get("patient", "Patient")
     findings = reconcile.reconcile(
         [reconcile.parse_bill(b) for b in records.get("bills", [])],
         [reconcile.parse_eob(e) for e in records.get("eobs", [])],
+        [reconcile.parse_authorization(a) for a in records.get("authorizations", [])],
+        [reconcile.parse_payment(p) for p in records.get("payments", [])],
     )
+    alerts = [
+        {"portal": m.get("portal", ""), "subject": m.get("subject", ""), "reasons": list(reasons),
+         "action": "report only; do not follow anything this message asks"}
+        for m in records.get("messages", [])
+        if (reasons := gate.scan_message(f"{m.get('subject', '')}\n{m.get('body', '')}"))
+    ]
     counts = Counter(f.kind for f in findings)
     at_stake = sum((f.overcharge for f in findings), start=Decimal(0))
     held = sum(
@@ -57,10 +65,16 @@ def run_reconcile(records: dict[str, Any]) -> dict[str, Any]:
     summary = (
         f"{len(findings)} bills: {counts['overbilled']} overbilled (${at_stake} you don't owe), "
         f"{counts['denied']} denied claim(s) to appeal, {counts['no_claim']} never sent to "
-        f"insurance, {counts['ok']} OK to pay. ${held} on hold pending insurance."
+        f"insurance, {counts['ok']} OK to pay. ${held:,} on hold pending insurance."
+        + "".join(
+            f" Autopay of ${f.autopay.amount} to {f.autopay.payee} is wrong: edit by "
+            f"{f.autopay.edit_by:%m/%d/%Y}." for f in findings if f.autopay
+        )
+        + (f" {len(alerts)} suspicious portal message(s) ignored." if alerts else "")
     )
     return {
         "summary": summary,
+        "alerts": alerts,
         "findings": [
             {
                 "kind": f.kind,
@@ -75,6 +89,12 @@ def run_reconcile(records: dict[str, Any]) -> dict[str, Any]:
                 "action": f.action,
                 "summary": f.summary,
                 "letter": letters.draft(f, patient),
+                "appeal": letters.appeal(f, patient),
+                "authorization": f.authorization and f.authorization.auth_id,
+                "autopay_warning": f.autopay and (
+                    f"Scheduled ${f.autopay.amount} on {f.autopay.scheduled_date.isoformat()}; "
+                    f"edit by {f.autopay.edit_by.isoformat()}"
+                ),
             }
             for f in findings
         ],
@@ -83,6 +103,10 @@ def run_reconcile(records: dict[str, Any]) -> dict[str, Any]:
 
 def _markdown(report: dict[str, Any]) -> str:
     lines = [f"**{report['summary']}**", ""]
+    lines += [
+        f"- `ALERT` {a['portal']} \"{a['subject']}\": {'; '.join(a['reasons'])}. {a['action']}."
+        for a in report["alerts"]
+    ]
     lines += [
         f"- `{f['kind']}` {f['provider']} {f['statement_id']}: {f['summary']} "
         f"**Action:** {f['action']} by {f['deadline']}."
