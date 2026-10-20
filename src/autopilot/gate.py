@@ -102,11 +102,19 @@ def inspect_email(email: dict[str, Any], portals: list[Portal]) -> Verdict:
     portal = _match_sender(address, portals)
     reasons: list[str] = []
 
+    impersonated = [
+        p.name for p in portals if p is not portal and any(a in claimed for a in p.aliases)
+    ]
     if portal is None:
-        impersonated = [p.name for p in portals if any(a in claimed for a in p.aliases)]
         reasons.append(
             f"sender {address or '(none)'} is not registered"
             + (f" but the email claims to be {', '.join(impersonated)}" if impersonated else "")
+        )
+    elif impersonated:
+        # A real sender for one portal claiming to be another is a hijacked or spoofed account.
+        reasons.append(
+            f"sender is registered for {portal.name} but the email claims to be "
+            + ", ".join(impersonated)
         )
 
     auth = email.get("auth", "").lower()

@@ -15,7 +15,8 @@ In any Bot chat:
 > to `~/autopilot/portals.json`.
 
 Edit `~/autopilot/portals.json` on the Bot computer (not in the public repo):
-- **Staged portals:** add the address you will send demo notifications from to `senders`.
+- **Staged portals:** add the Gmail address the demo emails come from to `senders` of the
+  `bluebonnet` entry only.
 - **MyChart:** set `login_url`, `sender_domains` and `link_domains` from a real MyChart
   notification email. Run the gate on that email before judging (step 4), and add any
   legitimate link domain it flags.
@@ -85,8 +86,14 @@ from Sentry.
 
 ## 5. Demo emails
 
-- **Trusted:** from the address in `senders`, subject "You have a new statement. Log in to
-  view.", body link to https://davidslayback.github.io/portal-autopilot/hospital/
-- **Phish:** from a *different* address, display name "Cedar Hollow CU Secure Message",
-  subject "New secure message: verify your account to avoid suspension", link text
-  `cedarhollowcu.example/secure` with its target set to `https://cedarhollow-cu-secure.com/login`.
+Both are Gmail drafts, sent from the inbox the Bot watches to itself. That address is registered
+as Bluebonnet's sender.
+
+- **Trusted:** subject "Bluebonnet Regional: you have a new statement. Log in to view.", with a
+  link to https://davidslayback.github.io/portal-autopilot/hospital/. Expected result: `trusted`,
+  handed to Clerk.
+- **Phish:** subject "Cedar Hollow CU: new secure message. Verify your account to avoid
+  suspension". The link text reads `cedarhollowcu.example/secure` but points to
+  `https://cedarhollow-cu-secure.example/login` (a reserved, unresolvable domain). Expected
+  result: `quarantine`, because a registered Bluebonnet sender is claiming to be Cedar Hollow, the
+  link domain is a look-alike, and the link text doesn't match where it points.

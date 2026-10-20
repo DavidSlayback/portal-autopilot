@@ -76,6 +76,17 @@ def test_impersonation_is_quarantined_with_every_reason():
     assert "DMARC did not pass" in reasons
 
 
+def test_registered_sender_claiming_another_portal_is_quarantined():
+    email = {
+        **_example("email_trusted.json"),
+        "subject": "Cedar Hollow CU: new secure message",
+        "links": [{"text": "Log in", "href": "https://cedarhollow-cu-secure.example/login"}],
+    }
+    reasons = " | ".join(gate.inspect_email(email, PORTALS).reasons)
+    assert "registered for Bluebonnet Regional Medical Center" in reasons
+    assert "claims to be Cedar Hollow Credit Union" in reasons
+
+
 @pytest.mark.parametrize(
     ("href", "reason"),
     [
